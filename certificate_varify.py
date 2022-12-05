@@ -41,25 +41,25 @@ with open("server_ip.txt") as ip_file:
             print(f"error on connection to Server, {host}")
 
         ##sending ses email
-            response = client.send_email(
-                Destination={
-                    "ToAddresses": ["nerdydreams92@gmail.com"],
+    response = client.send_email(
+        Destination={
+            "ToAddresses": ["nerdydreams92@gmail.com"],
+        },
+        Message={
+            "Body": {
+                "Text": {
+                    "Charset": "UTF-8",
+                    "Data": "The following certificates will expire soon; "
+                    + mailbody
+                    + "\nThank you.",
                 },
-                Message={
-                    "Body": {
-                        "Text": {
-                            "Charset": "UTF-8",
-                            "Data": "The following certificates will expire soon; "
-                            + mailbody
-                            + "\nThank you.",
-                        },
-                    },
-                    "Subject": {
-                        "Charset": "UTF-8",
-                        "Data": "Certificate Expiring Soon",
-                    },
-                },
-                Source="nerdydreams92@gmail.com",
-            )
+            },
+            "Subject": {
+                "Charset": "UTF-8",
+                "Data": "Certificate Expiring Soon",
+            },
+        },
+        Source="nerdydreams92@gmail.com",
+    )
 
 print(f"\nCert check complete!")
