@@ -14,6 +14,7 @@ with open("server_ip.txt") as ip_file:
     for ip in ip_file:
 
         try:
+            soon_to_expire = []
             host, port = ip.strip().split(":")
             print(f"\nChecking certifcate for server {host}")
             context = ssl.create_default_context()
@@ -24,30 +25,31 @@ with open("server_ip.txt") as ip_file:
                     certificate["notAfter"], "%b %d %H:%M:%S %Y %Z"
                 )
                 daysToExpiration = (certExpires - datetime.datetime.now()).days
-                print(f"Expires on: {certExpires} in {daysToExpiration} days")
-                ##preparing mailbody
-                mailbody = (
-                    "Server name: "
-                    + host
-                    + ", expires in "
-                    + str(daysToExpiration)
-                    + " days."
-                )
-
+                if daysToExpiration < 45:
+                    print(f"Expires on: {certExpires} in {daysToExpiration} days")
+                    soon_to_expire.append(host)
+                    
+                    ##preparing mailbody
+                    for h in soon_to_expire:
+                        #print(h)
+                        mailbody = (
+                            "Server name: " + h + ", expires in " + str(daysToExpiration) + " days."
+                        )
+                    # print(mailbody)
+                    # print("here")
         except:
             print(f"error on connection to Server, {host}")
 
         ##sending ses email
-        if daysToExpiration < 45:
             response = client.send_email(
                 Destination={
-                    "ToAddresses": ["user@gmail.com"],
+                    "ToAddresses": ["nerdydreams92@gmail.com"],
                 },
                 Message={
                     "Body": {
                         "Text": {
                             "Charset": "UTF-8",
-                            "Data": "The following requires attention; "
+                            "Data": "The following certificates will expire soon; "
                             + mailbody
                             + "\nThank you.",
                         },
@@ -57,7 +59,7 @@ with open("server_ip.txt") as ip_file:
                         "Data": "Certificate Expiring Soon",
                     },
                 },
-                Source="user@gmail.com",
+                Source="nerdydreams92@gmail.com",
             )
 
 print(f"\nCert check complete!")
